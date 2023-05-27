@@ -1,0 +1,29 @@
+{
+	"STORAGE_ROOT": "../storage",
+	"PORT": 80,
+	"DEBUG": false,
+	"SECRET_KEY": "ENC[AES256_GCM,data:aXGLgHVyujzPrtBG//i9Hv1N,iv:8Q/hztlUEL2+uMRKetSwPkD9lRIadiq7PdxJ2Zpa4v4=,tag:gSCazscCWYNJl7arInpb9Q==,type:str]",
+	"SQLALCHEMY_DATABASE_URI": "ENC[AES256_GCM,data:gD7AyannfxeT4rRWxuXZQZZX+Tw=,iv:zyit884SdMFjqSPU1A7xxhoEbAQILUGFgRk9y3a5ofU=,tag:/PAIxTB7UruEs72WdKSCAA==,type:str]",
+	"SQLALCHEMY_TRACK_MODIFICATIONS": false,
+	"SQLALCHEMY_ENGINE_OPTIONS": {
+		"pool_pre_ping": true,
+		"pool_recycle": 600
+	},
+	"sops": {
+		"kms": null,
+		"gcp_kms": null,
+		"azure_kv": null,
+		"hc_vault": null,
+		"age": [
+			{
+				"recipient": "age1qs8s94ypahgvhq8c0l2qm0l5jz2q958g2m54lm0nlzhwttg5msqqxqqlj5",
+				"enc": "-----BEGIN AGE ENCRYPTED FILE-----\nYWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZRHhhTEVUOGpvSjBzcE94\nekIrY2poZGI5OC9GN21DUFo5bEZIY1B3VkJnCmc4WFI2WVczQ3JrNVBXWkp6ajcw\nT2JYNXd0b01aeDdFQTRUTGhURUdNTlEKLS0tIENIbzZtSlJVYW82WUdYOFcwaWRr\nUE80bXh6SkJwRVByeVJONXV6MEV1UEUKW7GTP6A371tggsVdqfesi3WrNOr2gs0q\ntXLraNSEyaeFA42vUhdgUSck1SUFXWF0xKxJeemFspky34NECgRb9w==\n-----END AGE ENCRYPTED FILE-----\n"
+			}
+		],
+		"lastmodified": "2023-05-27T07:53:42Z",
+		"mac": "ENC[AES256_GCM,data:GbjgZ6GaX9yNaRwK0URMqN/ugJaXpH7mpIcZfgW75LGtF1xtNtkU3agweywDAr6y8CooNtbczUWNOMKJZXqNGbqsgRlTfoTSvq69fNYXPRVF+lq8Sx06PRvuFeOEcTkWJWfCgqhkXj/M5o4ZYKUf57fEsAOUpHzBSV5lg3N4+9E=,iv:1mNyDMZ4AmAnkZDOCmGCHdrmNfUAh9hxHyMK9JrbfnE=,tag:nmh/mgL3U51VhtUq0gYeRA==,type:str]",
+		"pgp": null,
+		"encrypted_regex": "^(SECRET_KEY|SQLALCHEMY_DATABASE_URI)$",
+		"version": "3.7.3"
+	}
+}
