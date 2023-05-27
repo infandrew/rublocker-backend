@@ -1,9 +1,9 @@
 {
-	"STORAGE_ROOT": "/mnt/storage",
+	"STORAGE_ROOT": "../storage",
 	"PORT": 80,
 	"DEBUG": false,
 	"SECRET_KEY": "ENC[AES256_GCM,data:SbtUcsiqgGxbXUZGCEpTN1aAXFjq+Q==,iv:oz8AQpQbRyrw+R9KmUqfqPGcfW+CDjvX0OddEqQNqFw=,tag:FCQFVSVPgNxbD/AhhjcS9A==,type:str]",
-	"SQLALCHEMY_DATABASE_URI": "ENC[AES256_GCM,data:0UuM3b4znu9xdW7CkGmE/1MPl32IsU3ankbBSDzf+cWeP/vNIsY93X2cwnQdFVAa2w==,iv:vTWIWXbF8ymJkzS+qlIYiUzpm8CO3PoYyYQ2hMOL1bc=,tag:CMh2ADFpTOQaijCegIMbsg==,type:str]",
+	"SQLALCHEMY_DATABASE_URI": "ENC[AES256_GCM,data:/XkMzUuUIPcnH+LW1PdS+PD5WfMG03jF+kjMfz5OtBlO1ukiniCRRH6HAXVs6tW+0GHb1kqWp6VlZRGZtg==,iv:i1yH5pGodJarBEZgDsODkGTs0Bygmk+f9zQLz1RR5rQ=,tag:cIe6czRryQcJl03dYSw3Rg==,type:str]",
 	"SQLALCHEMY_TRACK_MODIFICATIONS": false,
 	"SQLALCHEMY_ENGINE_OPTIONS": {
 		"pool_pre_ping": true,
@@ -20,8 +20,8 @@
 				"enc": "-----BEGIN AGE ENCRYPTED FILE-----\nYWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZRGVwT2NaQVRXazZtUEhh\nY3p4MVg2UzdlME5McHJnczU2Z2VycmtXbzBVClRCUEZ4T2Y5aFgvc2RDNlNoTHAy\nenRRMis4YTBZYkhlVERKamUvYjM4VmMKLS0tIFZMeFZjS21iM2tjTXJSaHZBV1gy\nNmtlbW11YkdSdDZHTlRYb09qNURDcHMKjAuaLs9YU/MLjgjqSww5uheHks08eVVx\nup+3Uq6QiPwKKnFd5dASxOEHDQQ5TXjgQx6dsHVjgd0mZO4NLX+9Xw==\n-----END AGE ENCRYPTED FILE-----\n"
 			}
 		],
-		"lastmodified": "2023-05-27T08:08:09Z",
-		"mac": "ENC[AES256_GCM,data:I6Cvs+WB2sE+sZIOOxvVqDsxeBxCFVEbLZ9NaT0jEjTmIQjycJxyCLc63Q/WxMI2y3ZpEUw1h20HczEArHjfUlh3YhsGo2NgyOMhskk8K9oiqT37AqRhOGtYa4LTfq9KtjUSugEKZrIvmc+137laU8c+bvBvfmOtvzIjyUd3L4o=,iv:WQGnYx6+L/bwKX8q8qV+j10SHRcHcyxQNHAhrXLNnH0=,tag:98mxpfmUG5Zn99QmVKgB5Q==,type:str]",
+		"lastmodified": "2023-05-27T11:04:51Z",
+		"mac": "ENC[AES256_GCM,data:h9lCuKUitRLNviGF/Rr4QM4ueiH7QZeKMmNfC3xwrnBhdzbAmeEjsLmjNia5Cb6D/iPuETNrLNs+35caCcDfW18LlicH4Y4/bFepBrNzPNAuLzTw3kI++3b2Nbb5rJceO6X9UNJvAd8EjuY/iwcinMWgsFFTHOl8spTtVczQ/EQ=,iv:M4wlNoPip54pmsC5Yc+mj/wEk7BC2WDGICfrYlJ6b7M=,tag:ocRqfYHaldcg/EK+bdUUwg==,type:str]",
 		"pgp": null,
 		"encrypted_regex": "^(SECRET_KEY|SQLALCHEMY_DATABASE_URI)$",
 		"version": "3.7.3"

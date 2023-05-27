@@ -1,20 +1,35 @@
-from datetime import datetime, timedelta
 import os
+import sys
+import json
 import threading
-from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
 import yt_dlp
 import logging
 import whisper
 import threading
+import subprocess
+from flask import Flask, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format="[%(levelname)5s] %(message)s", level=logging.DEBUG)
 
+def get_config(config_path):
+    # try to decrypt with sops
+    if ".enc." in config_path:
+        try:
+            result = subprocess.run(['sops', '--decrypt', config_path], capture_output=True)
+            return json.loads(result.stdout.decode('utf-8'))
+        except:
+            logger.error("Failed to decrypt configuration")
+            exit(1)
+    else:            
+        with open(config_path) as config:
+            return json.load(config)
+
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config.update(get_config(sys.argv[1]))
 db = SQLAlchemy(app)
 
 downloadLock = threading.Lock()
@@ -134,7 +149,7 @@ def download():
 
                 ydl_opts = {
                     "format": "opus/bestaudio/best",
-                    "outtmpl": f"download/{record.youtube_id}",
+                    "outtmpl": f"{app.config['STORAGE_ROOT']}/{record.youtube_id}",
                 }
 
                 error_code = 0
@@ -206,7 +221,7 @@ def analyze():
                 logger.info(f"record started analysis: {record.youtube_id}")
                 error_code = 0
                 try:
-                    audio_path = f"download/{record.youtube_id}"
+                    audio_path = f"{app.config['STORAGE_ROOT']}/{record.youtube_id}"
                     if os.path.exists(audio_path):
                         logger.info(f"File exists: {audio_path}")
                     audio = whisper.load_audio(audio_path)
@@ -251,12 +266,13 @@ def fixIncorrectStates():
         logger.info(f"Updated incorrect states: {rows_updated}")
 
 
+fixIncorrectStates()
+threading.Thread(target=download, daemon=True).start()
+threading.Thread(target=download, daemon=True).start()
+logger.info("download thread started")
+threading.Thread(target=analyze, daemon=True).start()
+threading.Thread(target=analyze, daemon=True).start()
+logger.info("analyze thread started")
+
 if __name__ == "__main__":
-    fixIncorrectStates()
-    threading.Thread(target=download, daemon=True).start()
-    threading.Thread(target=download, daemon=True).start()
-    logger.info("download thread started")
-    threading.Thread(target=analyze, daemon=True).start()
-    threading.Thread(target=analyze, daemon=True).start()
-    logger.info("analyze thread started")
     app.run()
