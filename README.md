@@ -9,9 +9,10 @@ docker image build \
 ```
 # Run
 ```
+docker rm -f rublocker-container
 docker run --name rublocker-container \
-    -p 5000:5000 \
-    -v /home/ubuntu/storage:/mnt/storage
+    -p 80:80 \
+    -v /home/${USER}/storage:/home/${USER}/storage \
     --rm -it rublocker-image bash
 ```
 # Config encrypted with sops

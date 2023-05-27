@@ -32,5 +32,5 @@ RUN pip3 install -r requirements.txt --no-cache-dir
 
 COPY --chown=${USER_NAME}:${GROUP_NAME} . /home/${USER_NAME}/app
 
-CMD python3 server.py
+CMD python3 server.py config-aws.enc.json
 
