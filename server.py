@@ -75,7 +75,6 @@ class Record(db.Model):
         self.youtube_id = youtube_id
 
 
-@app.route("/recreate/db")
 def recreate_db():
     db.drop_all()
     db.create_all()
@@ -254,16 +253,19 @@ def analyze():
 
 
 def fixIncorrectStates():
-    with app.app_context():
-        rows_updated = (
-            db.session.query(Record)
-            .filter(
-                Record.state.in_([ANALYSIS_STATE, DOWNLOAD_STATE, DOWNLOADED_STATE])
+    try:
+        with app.app_context():
+            rows_updated = (
+                db.session.query(Record)
+                .filter(
+                    Record.state.in_([ANALYSIS_STATE, DOWNLOAD_STATE, DOWNLOADED_STATE])
+                )
+                .update({Record.state: INIT_STATE}, synchronize_session=False)
             )
-            .update({Record.state: INIT_STATE}, synchronize_session=False)
-        )
-        db.session.commit()
-        logger.info(f"Updated incorrect states: {rows_updated}")
+            db.session.commit()
+            logger.info(f"Updated incorrect states: {rows_updated}")
+    except Exception as e:
+        logger.error(e)
 
 
 fixIncorrectStates()
