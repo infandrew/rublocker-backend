@@ -1,7 +1,7 @@
 import os
 import sys
+import time
 import json
-import threading
 import yt_dlp
 import logging
 import whisper
@@ -31,9 +31,6 @@ def get_config(config_path):
 app = Flask(__name__)
 app.config.update(get_config(sys.argv[1]))
 db = SQLAlchemy(app)
-
-downloadLock = threading.Lock()
-analysisLock = threading.Lock()
 
 INIT_STATE = "INIT"
 DOWNLOAD_STATE = "DOWNLOAD"
@@ -80,6 +77,18 @@ def recreate_db():
     db.create_all()
     return ""
 
+@app.route("/verify/states")
+def fix_incorrect_states_api():
+    fix_incorrect_states()
+    
+@app.route("/stat/scan/time")
+def stat_scan_time():
+    total_duration = (
+        db.session.query(func.sec_to_time(func.sum(Record.duration)))
+        .filter(Record.state != FAIL_STATE).scalar()
+    )
+    result = f'<div style="background:black; color:white; text-align:center;">Total scanned duration: {str(total_duration)}</div>'
+    return result
 
 @app.route("/verify/fails")
 def verify_fails():
@@ -130,148 +139,147 @@ def identify(youtube_id: str):
 
 
 def download():
-    with app.app_context():
-        while True:
-            downloadLock.acquire()
+    while True:
+        time.sleep(0.5)
+        with app.app_context():
             record: Record = (
                 db.session.query(Record)
+                .with_for_update()
                 .filter_by(state=INIT_STATE)
                 .order_by(Record.create_date.asc())
                 .first()
             )
-            if record is not None:
-                record.state = DOWNLOAD_STATE
-                db.session.commit()
-                downloadLock.release()
+            if record is None:
+                continue
+                
+            record.state = DOWNLOAD_STATE
+            db.session.commit()
 
-                logger.info(f"record started download: {record.id}/{record.youtube_id}")
+            logger.info(f"record started download: {record.id}/{record.youtube_id}")
 
-                ydl_opts = {
-                    "format": "opus/bestaudio/best",
-                    "outtmpl": f"{app.config['STORAGE_ROOT']}/{record.youtube_id}",
-                }
+            ydl_opts = {
+                "format": "opus/bestaudio/best",
+                "outtmpl": f"{app.config['STORAGE_ROOT']}/{record.youtube_id}",
+            }
 
-                error_code = 0
-                try:
-                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                        info = ydl.extract_info(record.youtube_id, download=False)
-                        if info["live_status"] == "is_live":
-                            logger.info("Live streams should be skipped for now")
-                            error_code = -2
-                            if datetime.now() - datetime.fromtimestamp(
-                                info["release_timestamp"]
-                            ) > timedelta(days=1):
-                                record.fail_reason = REASON_FAIL_LONG_LIVE_STREAM
-                            else:
-                                record.fail_reason = REASON_FAIL_LIVE_STREAM
-                        elif (
-                            "duration" in info
-                            and info["duration"] > VIDEO_DURATION_THRESHOLD
-                        ):
-                            logger.info(f"Video is too big: {info['duration']}s")
-                            error_code = -3
-                            record.duration = info["duration"]
-                            record.fail_reason = REASON_FAIL_TOO_LONG
+            error_code = 0
+            try:
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    info = ydl.extract_info(record.youtube_id, download=False)
+                    if info["live_status"] == "is_live":
+                        logger.info("Live streams should be skipped for now")
+                        error_code = -2
+                        if datetime.now() - datetime.fromtimestamp(
+                            info["release_timestamp"]
+                        ) > timedelta(days=1):
+                            record.fail_reason = REASON_FAIL_LONG_LIVE_STREAM
                         else:
-                            record.duration = info["duration"]
-                            error_code = ydl.download([record.youtube_id])
-                except Exception as e:
-                    logger.error(f"Downloaded error_code: {error_code}")
-                    logger.error(e)
-                    if hasattr(e, "msg"):
-                        if "requires payment" in e.msg:
-                            record.fail_reason = REASON_FAIL_REQUIRES_PAYMENT
-                        if "not available" in e.msg:
-                            record.fail_reason = REASON_FAIL_NOT_AVAILABLE
-                        if "live event will begin" in e.msg:
-                            record.fail_reason = REASON_FAIL_WILL_BEGIN
-                        if "Private video" in e.msg:
-                            record.fail_reason = REASON_FAIL_PRIVATE_VIDEO
-                        if "This video may be inappropriate" in e.msg:
-                            record.fail_reason = REASON_FAIL_INAPPROPRIATE
-                    error_code = -1
+                            record.fail_reason = REASON_FAIL_LIVE_STREAM
+                    elif (
+                        "duration" in info
+                        and info["duration"] > VIDEO_DURATION_THRESHOLD
+                    ):
+                        logger.info(f"Video is too big: {info['duration']}s")
+                        error_code = -3
+                        record.duration = info["duration"]
+                        record.fail_reason = REASON_FAIL_TOO_LONG
+                    else:
+                        record.duration = info["duration"]
+                        error_code = ydl.download([record.youtube_id])
+            except Exception as e:
+                logger.error(f"Downloaded error_code: {error_code}")
+                logger.error(e)
+                if hasattr(e, "msg"):
+                    if "requires payment" in e.msg:
+                        record.fail_reason = REASON_FAIL_REQUIRES_PAYMENT
+                    if "not available" in e.msg:
+                        record.fail_reason = REASON_FAIL_NOT_AVAILABLE
+                    if "live event will begin" in e.msg:
+                        record.fail_reason = REASON_FAIL_WILL_BEGIN
+                    if "Private video" in e.msg:
+                        record.fail_reason = REASON_FAIL_PRIVATE_VIDEO
+                    if "This video may be inappropriate" in e.msg:
+                        record.fail_reason = REASON_FAIL_INAPPROPRIATE
+                error_code = -1
 
-                if error_code == 0:
-                    record.state = DOWNLOADED_STATE
-                else:
-                    record.state = FAIL_STATE
-                db.session.commit()
+            if error_code == 0:
+                record.state = DOWNLOADED_STATE
             else:
-                downloadLock.release()
+                record.state = FAIL_STATE
+            db.session.commit()
 
 
 def analyze():
     model = whisper.load_model("base")
     logger.info("whisper base model loaded")
-    with app.app_context():
-        while True:
-            analysisLock.acquire()
+    while True:
+        time.sleep(0.5)
+        with app.app_context():
             record: Record = (
                 db.session.query(Record)
+                .with_for_update()
                 .filter_by(state=DOWNLOADED_STATE)
                 .order_by(Record.create_date.asc())
                 .first()
             )
-            if record is not None:
-                record.state = ANALYSIS_STATE
-                db.session.commit()
-                analysisLock.release()
-
-                logger.info(f"record started analysis: {record.youtube_id}")
-                error_code = 0
-                try:
-                    audio_path = f"{app.config['STORAGE_ROOT']}/{record.youtube_id}"
-                    if os.path.exists(audio_path):
-                        logger.info(f"File exists: {audio_path}")
-                    audio = whisper.load_audio(audio_path)
-                    logger.info(f"File loaded by whisper: {audio_path}")
-                    audio = whisper.pad_or_trim(audio)
-                    mel = whisper.log_mel_spectrogram(audio).to(model.device)
-                    _, probs = model.detect_language(mel)
-                    logger.debug(f"Detected language ru: {probs['ru']}")
-                    logger.debug(f"Detected language en: {probs['en']}")
-                    logger.debug(f"Detected language uk: {probs['uk']}")
-                    record.ru_score = probs["ru"]
-                    record.en_score = probs["en"]
-                    record.uk_score = probs["uk"]
-                except Exception as e:
-                    logger.error(e)
-                    error_code = -1
-
-                if error_code == 0:
-                    record.state = ANALYZED_STATE
-                else:
-                    record.state = FAIL_STATE
-                db.session.commit()
-                
-                # Lets remove the audio
-                os.remove(audio_path)
-                if os.path.exists(audio_path):
-                    logger.error(f"File failed to be deleted: {audio_path}")
-            else:
-                analysisLock.release()
-
-
-def fixIncorrectStates():
-    try:
-        with app.app_context():
-            rows_updated = (
-                db.session.query(Record)
-                .filter(
-                    Record.state.in_([ANALYSIS_STATE, DOWNLOAD_STATE, DOWNLOADED_STATE])
-                )
-                .update({Record.state: INIT_STATE}, synchronize_session=False)
-            )
+            if record is None:
+                continue
+            
+            record.state = ANALYSIS_STATE
             db.session.commit()
-            logger.info(f"Updated incorrect states: {rows_updated}")
+
+            logger.info(f"record started analysis: {record.youtube_id}")
+            error_code = 0
+            try:
+                audio_path = f"{app.config['STORAGE_ROOT']}/{record.youtube_id}"
+                if os.path.exists(audio_path):
+                    logger.info(f"File exists: {audio_path}")
+                audio = whisper.load_audio(audio_path)
+                logger.info(f"File loaded by whisper: {audio_path}")
+                audio = whisper.pad_or_trim(audio)
+                mel = whisper.log_mel_spectrogram(audio).to(model.device)
+                _, probs = model.detect_language(mel)
+                logger.debug(f"Detected language ru: {probs['ru']}")
+                logger.debug(f"Detected language en: {probs['en']}")
+                logger.debug(f"Detected language uk: {probs['uk']}")
+                record.ru_score = probs["ru"]
+                record.en_score = probs["en"]
+                record.uk_score = probs["uk"]
+            except Exception as e:
+                logger.error(e)
+                error_code = -1
+
+            if error_code == 0:
+                record.state = ANALYZED_STATE
+            else:
+                record.state = FAIL_STATE
+            db.session.commit()
+            
+            # Lets remove the audio
+            os.remove(audio_path)
+            if os.path.exists(audio_path):
+                logger.error(f"File failed to be deleted: {audio_path}")
+
+
+def fix_incorrect_states():
+    try:
+        rows_updated = (
+            db.session.query(Record)
+            .filter(
+                Record.state.in_([ANALYSIS_STATE, DOWNLOAD_STATE, DOWNLOADED_STATE])
+            )
+            .update({Record.state: INIT_STATE}, synchronize_session=False)
+        )
+        db.session.commit()
+        logger.info(f"Updated incorrect states: {rows_updated}")
     except Exception as e:
         logger.error(e)
 
 
-fixIncorrectStates()
 threading.Thread(target=download, daemon=True).start()
 threading.Thread(target=download, daemon=True).start()
 logger.info("download thread started")
+
 threading.Thread(target=analyze, daemon=True).start()
 threading.Thread(target=analyze, daemon=True).start()
 logger.info("analyze thread started")
