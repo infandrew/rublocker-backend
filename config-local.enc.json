@@ -9,6 +9,9 @@
 		"pool_pre_ping": true,
 		"pool_recycle": 600
 	},
+	"RUBLOCKER_DOWNLOAD_THREADS_LIMIT": 2,
+	"RUBLOCKER_ANALYSIS_THREADS_LIMIT": 2,
+	"RUBLOCKER_DOWNLOADED_LIMIT": 2,
 	"sops": {
 		"kms": null,
 		"gcp_kms": null,
@@ -20,8 +23,8 @@
 				"enc": "-----BEGIN AGE ENCRYPTED FILE-----\nYWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZRHhhTEVUOGpvSjBzcE94\nekIrY2poZGI5OC9GN21DUFo5bEZIY1B3VkJnCmc4WFI2WVczQ3JrNVBXWkp6ajcw\nT2JYNXd0b01aeDdFQTRUTGhURUdNTlEKLS0tIENIbzZtSlJVYW82WUdYOFcwaWRr\nUE80bXh6SkJwRVByeVJONXV6MEV1UEUKW7GTP6A371tggsVdqfesi3WrNOr2gs0q\ntXLraNSEyaeFA42vUhdgUSck1SUFXWF0xKxJeemFspky34NECgRb9w==\n-----END AGE ENCRYPTED FILE-----\n"
 			}
 		],
-		"lastmodified": "2023-05-27T07:53:42Z",
-		"mac": "ENC[AES256_GCM,data:GbjgZ6GaX9yNaRwK0URMqN/ugJaXpH7mpIcZfgW75LGtF1xtNtkU3agweywDAr6y8CooNtbczUWNOMKJZXqNGbqsgRlTfoTSvq69fNYXPRVF+lq8Sx06PRvuFeOEcTkWJWfCgqhkXj/M5o4ZYKUf57fEsAOUpHzBSV5lg3N4+9E=,iv:1mNyDMZ4AmAnkZDOCmGCHdrmNfUAh9hxHyMK9JrbfnE=,tag:nmh/mgL3U51VhtUq0gYeRA==,type:str]",
+		"lastmodified": "2023-05-27T20:06:02Z",
+		"mac": "ENC[AES256_GCM,data:2hltBzAGTxt2CYN59XQEN96Hw7Jx2V8i5wD/KErtx4Umr0Xy98kVuLDGHkft5FKZ0d7BXiw3gdzxq3zy+o9awa6KkLdCKOWXoRu64q73H9cJSsxEb7TQJTCBAQ0Avxq7erV2ZEOv0ocF4QVZ51u/c9EZakdwj+FGpdk9aEmV+iA=,iv:KOJi3iRuVZP/tbMGu3j+JdYECNJNwXGWZWznYK+u4bY=,tag:5aYEedBgESCQHb15lvhGQg==,type:str]",
 		"pgp": null,
 		"encrypted_regex": "^(SECRET_KEY|SQLALCHEMY_DATABASE_URI)$",
 		"version": "3.7.3"
