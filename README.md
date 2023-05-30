@@ -9,11 +9,13 @@ docker image build \
 ```
 # Run
 ```
+mkdir -p /home/${USER}/storage
 docker rm -f rublocker-container
 docker run --name rublocker-container \
-    -p 80:80 \
+    -p 80:5000 \
+    -e SOPS_AGE_KEY=${SOPS_AGE_KEY} \
     -v /home/${USER}/storage:/home/${USER}/storage \
-    --rm -it rublocker-image bash
+    --restart=always -d rublocker-image
 ```
 # Config encrypted with sops
 ```

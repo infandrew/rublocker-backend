@@ -30,7 +30,15 @@ COPY requirements.txt requirements.txt
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt --no-cache-dir
 
+USER root
+RUN curl -Lo sops.deb "https://github.com/mozilla/sops/releases/latest/download/sops_3.7.3_amd64.deb" && \
+    apt-get --fix-broken install ./sops.deb && \
+    apt-get update && \
+    apt-get install -y age ffmpeg
+
+USER ${USER_NAME}
+
 COPY --chown=${USER_NAME}:${GROUP_NAME} . /home/${USER_NAME}/app
 
-CMD python3 server.py config-aws.enc.json
+CMD python3 server.py config-aws-2.enc.json
 

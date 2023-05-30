@@ -1,6 +1,5 @@
 {
 	"STORAGE_ROOT": "../storage",
-	"PORT": 80,
 	"DEBUG": false,
 	"SECRET_KEY": "ENC[AES256_GCM,data:SbtUcsiqgGxbXUZGCEpTN1aAXFjq+Q==,iv:oz8AQpQbRyrw+R9KmUqfqPGcfW+CDjvX0OddEqQNqFw=,tag:FCQFVSVPgNxbD/AhhjcS9A==,type:str]",
 	"SQLALCHEMY_DATABASE_URI": "ENC[AES256_GCM,data:/XkMzUuUIPcnH+LW1PdS+PD5WfMG03jF+kjMfz5OtBlO1ukiniCRRH6HAXVs6tW+0GHb1kqWp6VlZRGZtg==,iv:i1yH5pGodJarBEZgDsODkGTs0Bygmk+f9zQLz1RR5rQ=,tag:cIe6czRryQcJl03dYSw3Rg==,type:str]",
@@ -23,8 +22,8 @@
 				"enc": "-----BEGIN AGE ENCRYPTED FILE-----\nYWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZRGVwT2NaQVRXazZtUEhh\nY3p4MVg2UzdlME5McHJnczU2Z2VycmtXbzBVClRCUEZ4T2Y5aFgvc2RDNlNoTHAy\nenRRMis4YTBZYkhlVERKamUvYjM4VmMKLS0tIFZMeFZjS21iM2tjTXJSaHZBV1gy\nNmtlbW11YkdSdDZHTlRYb09qNURDcHMKjAuaLs9YU/MLjgjqSww5uheHks08eVVx\nup+3Uq6QiPwKKnFd5dASxOEHDQQ5TXjgQx6dsHVjgd0mZO4NLX+9Xw==\n-----END AGE ENCRYPTED FILE-----\n"
 			}
 		],
-		"lastmodified": "2023-05-28T01:44:46Z",
-		"mac": "ENC[AES256_GCM,data:SUPUWBW8PUbHG1lkYV0lQBIbYD/e/6i3pOOFTDUP9zO5d1WvGRms4l1c19GuM0imLCBFggiF8U+TI6JuyTGwOEBOkEi4Wkx6xuhf8D9oGy0ZTXJYYlFeAOn+q7/eUCYW2hDSjNpkzu6RVerTNNWOA5a9CeYF+t15dSzbFcLanj4=,iv:HJ9pRzXCIMfEeNPS9OaBAydQ4clMArLWN0rzhrDvIIo=,tag:Fje4UeJsizGcKj/lkrWjCg==,type:str]",
+		"lastmodified": "2023-05-30T04:14:12Z",
+		"mac": "ENC[AES256_GCM,data:bybe9U/s+8jJTANsI8nKZarfY0MRmDBQ3E8IthjOLOFHE8Ye1D2djoF5RxsgkQ0wFitD2si14o9piAB9hKQ3S9fW59vZGD24mfjfXFGITakNpObuUwMtdIW3W37L9rm1DV5j9RwGhp3oLjNhR7m7eq7d/HWQi3x7wceXSD0ba0s=,iv:6egL6PaLk7qsSt3iWTCJIR7I9kCKHbIa9ZSx8I3xpos=,tag:Ic186kxR0moKqkA8kDcIvA==,type:str]",
 		"pgp": null,
 		"encrypted_regex": "^(SECRET_KEY|SQLALCHEMY_DATABASE_URI)$",
 		"version": "3.7.3"

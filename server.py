@@ -22,7 +22,7 @@ def get_config(config_path):
         try:
             result = subprocess.run(['sops', '--decrypt', config_path], capture_output=True)
             return json.loads(result.stdout.decode('utf-8'))
-        except:
+        except Exception as e:
             logger.error("Failed to decrypt configuration")
             exit(1)
     else:            
@@ -89,7 +89,7 @@ def fix_incorrect_states_api():
 def stat_scan_time():
     total_duration = (
         db.session.query(func.sum(Record.duration))
-        .filter(Record.duration.isnot(None),Record.state!=FAIL_STATE).scalar()
+        .filter(Record.duration.isnot(None),Record.state==ANALYZED_STATE).scalar()
     )
     hours, remainder = divmod(total_duration, 3600)
     # minutes, seconds = divmod(remainder, 60)
@@ -217,7 +217,7 @@ def download():
                     if hasattr(e, "msg"):
                         if "requires payment" in e.msg:
                             record.fail_reason = REASON_FAIL_REQUIRES_PAYMENT
-                        if "not available" in e.msg:
+                        if "not available" in e.msg or "Video unavailable" in e.msg:
                             record.fail_reason = REASON_FAIL_NOT_AVAILABLE
                         if "live event will begin" in e.msg:
                             record.fail_reason = REASON_FAIL_WILL_BEGIN
