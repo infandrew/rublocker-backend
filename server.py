@@ -262,14 +262,22 @@ def analyze():
                     audio_path = f"{app.config['STORAGE_ROOT']}/{record.youtube_id}"
                     if os.path.exists(audio_path):
                         logger.info(f"File exists: {audio_path}")
+                    t1 = time.time()
                     audio = whisper.load_audio(audio_path)
+                    t2 = time.time()
                     logger.info(f"File loaded by whisper: {audio_path}")
                     audio = whisper.pad_or_trim(audio)
+                    t3 = time.time()
                     mel = whisper.log_mel_spectrogram(audio).to(model.device)
+                    t4 = time.time()
                     _, probs = model.detect_language(mel)
+                    t5 = time.time()
+
                     logger.debug(f"Detected language ru: {probs['ru']}")
                     logger.debug(f"Detected language en: {probs['en']}")
                     logger.debug(f"Detected language uk: {probs['uk']}")
+                    logger.debug(f"Elapsed time: {t2 - t1} {t3 - t2} {t4 - t3} {t5 - t4}")
+
                     record.ru_score = probs["ru"]
                     record.en_score = probs["en"]
                     record.uk_score = probs["uk"]
