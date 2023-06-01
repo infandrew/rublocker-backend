@@ -292,6 +292,7 @@ def analyze():
                 db.session.commit()
                 
                 # Lets remove the audio
+                # TODO could be configurable
                 os.remove(audio_path)
                 if os.path.exists(audio_path):
                     logger.error(f"File failed to be deleted: {audio_path}")
