@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 yt-dlp
 openai-whisper
 PyMySQL
+waitress

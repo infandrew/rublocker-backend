@@ -6,6 +6,7 @@ import uuid
 import yt_dlp
 import logging
 import whisper
+import waitress
 import threading
 import subprocess
 from flask import Flask, jsonify
@@ -327,4 +328,4 @@ for i in range(analysis_threads_limit):
 logger.info(f"Analysis threads started (count: {analysis_threads_limit})")
 
 if __name__ == "__main__":
-    app.run()
+    waitress.serve(app, host='0.0.0.0', port=5000)
